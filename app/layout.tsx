@@ -1,6 +1,7 @@
 import React from 'react'
 import Navbar from '@components/Navbar'
 import Provider from '@components/Provider'
+import MUIThemeProvider from '@components/ThemeProvider'
 import '@styles/global.css'
 
 const RootLayout = ( { children, } 
@@ -10,14 +11,18 @@ const RootLayout = ( { children, }
   return (
     <html lang='en'>
       <body>
-        <div className="main">
-            <div className="gradient" />
-        </div>
+        <Provider>
+          <MUIThemeProvider>
+            <div className="main">
+                <div className="gradient" />
+            </div>
 
-        <main className="app">
-            <Navbar />
-            {children}
-        </main>
+            <main className="app">
+                <Navbar />
+                {children}
+            </main>
+          </MUIThemeProvider>
+        </Provider>
       </body>
     </html>
   )
