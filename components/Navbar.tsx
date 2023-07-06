@@ -2,15 +2,39 @@
 
 import React from 'react'
 import { signIn, signOut, useSession, getSession } from 'next-auth/react';
+import Image from 'next/image';
 import { Button } from '@mui/material'
+import AddVehicleButton from './AddVehicleButton';
 
 const Navbar = () => {
-  const { data: session } = useSession();
+  const session = useSession();
+  console.log(session);
+  // const res = fetch("http://localhost:3000/api/login", {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json"
+  //   },
+  //   body: JSON.stringify({
+  //       username: "John", 
+  //       password: "111"
+  //   }),
+  // })
+  // .then(res => console.log(res.json()))
   // console.log(JSON.stringify(session?.user));
 
   async function test(){
-    const testcase = await getSession();
-    console.log(JSON.stringify(testcase));
+    const res = await fetch("http://localhost:3000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          username: "John", 
+          password: "111"
+      }),
+    })
+    const user = await res.json();
+    console.log(user);
   }
 
   test();
@@ -30,19 +54,28 @@ const Navbar = () => {
   //   </button>
   // );
   return (
-    <nav className='flex flex-row-reverse w-full p-6 gap-2 bg-primary'>
-      {session?.user ? (
+    <nav className='flex-between w-full p-6 gap-2 bg-primary'>
+      {session.data?.user ? (
       <>
-        <div>{session?.user.name}</div>
+        <div>{session?.data.user.name}</div>
         <Button variant='contained' className='bg-orange-500' onClick={() => signOut()}>
           Sign Out
         </Button>
       </>) : 
       ( 
         <>
-          <Button variant='contained' className='bg-orange-500' onClick={() => signIn()}>
+          <Image 
+            src="/logo.svg"
+            alt="logo"
+            width={150}
+            height={0}
+            className='object-contain'
+          />  
+          
+          <AddVehicleButton />
+          {/* <Button variant='contained' className='bg-orange-500' onClick={() => signIn()}>
             Sign In
-          </Button>
+          </Button> */}
         </>
       )}
       

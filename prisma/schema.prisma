@@ -19,18 +19,13 @@ model Admin {
   vehicles Vehicle[]
 }
 
-model Type {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String @unique
-  price Float
-  vehicles Vehicle[]
-}
-
 model Vehicle {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+  owner String @unique
+  model String
+  identification String
   admin Admin @relation(fields: [managedBy], references: [id])
   managedBy String @db.ObjectId
-  type Type @relation(fields: [typeName], references: [name])
   typeName String
   services Services[]
   inputTime DateTime
