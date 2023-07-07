@@ -1,7 +1,8 @@
 import prisma from "@lib/prisma";
+import { Vehicle } from "@interfaces";
 
-async function POST(request: Request){
-    const body = await request.json();
+export async function POST(request: Request){
+    const body: Vehicle = await request.json();
 
     const newVehicle = await prisma.vehicle.create({
         data: {
@@ -13,4 +14,6 @@ async function POST(request: Request){
             inputTime: new Date()
         }
     });
+
+    return new Response(JSON.stringify(newVehicle));
 }
