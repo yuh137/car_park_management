@@ -8,7 +8,7 @@ import AddVehicleButton from './AddVehicleButton';
 
 const Navbar = () => {
   const session = useSession();
-  console.log(session);
+  // console.log(session);
   // const res = fetch("http://localhost:3000/api/login", {
   //   method: "POST",
   //   headers: {
@@ -22,22 +22,22 @@ const Navbar = () => {
   // .then(res => console.log(res.json()))
   // console.log(JSON.stringify(session?.user));
 
-  async function test(){
-    const res = await fetch("http://localhost:3000/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-          username: "John", 
-          password: "111"
-      }),
-    })
-    const user = await res.json();
-    console.log(user);
-  }
+  // async function test(){
+  //   const res = await fetch("http://localhost:3000/api/login", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body: JSON.stringify({
+  //         username: "John", 
+  //         password: "111"
+  //     }),
+  //   })
+  //   const user = await res.json();
+  //   console.log(user);
+  // }
 
-  test();
+  // test();
   // if (session && session.user) {
   //   return (
   //     <div className="flex gap-4 ml-auto">

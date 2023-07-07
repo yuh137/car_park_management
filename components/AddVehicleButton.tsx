@@ -2,8 +2,6 @@
 
 import React, { useState, FormEvent } from 'react'
 import { Button, Modal, TextField, Box, Radio, RadioGroup, FormControlLabel } from '@mui/material'
-import { Vehicle } from '@interfaces'
-import { addVehicle } from '@controllers/addVehicle'
 
 const AddVehicleButton = () => {
   const [open, setOpen] = useState(false);

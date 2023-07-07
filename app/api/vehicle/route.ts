@@ -1,6 +1,12 @@
 import prisma from "@lib/prisma";
 import { Vehicle } from "@interfaces";
 
+export async function GET(request: Request){
+    const vehicles = await prisma.vehicle.findMany();
+
+    return new Response(JSON.stringify(vehicles));
+}
+
 export async function POST(request: Request){
     const body: Vehicle = await request.json();
 

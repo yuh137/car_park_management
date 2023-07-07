@@ -8,9 +8,8 @@ import FilterDisplay from '@components/FilterDisplay';
 const Home = () => {
 
   return (
-    <div className="container pt-[10rem] justify-center items-center flex flex-col bg-[#FFFAD7]">
+    <div className="container pt-[5rem] justify-center items-center flex flex-col bg-[#FFFAD7]">
       <FilterDisplay />
-      
     </div>
   )
 }

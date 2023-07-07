@@ -23,7 +23,7 @@ model Vehicle {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   owner String @unique
   model String
-  identification String
+  identification String @unique
   admin Admin @relation(fields: [managedBy], references: [id])
   managedBy String @db.ObjectId
   typeName String
