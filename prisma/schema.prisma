@@ -21,7 +21,7 @@ model Admin {
 
 model Vehicle {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  owner String @unique
+  owner String
   model String
   identification String @unique
   admin Admin @relation(fields: [managedBy], references: [id])

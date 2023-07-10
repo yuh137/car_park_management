@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Container, Box, TextField, Checkbox, Card, Modal, Pagination, FormGroup, FormControl, FormControlLabel } from '@mui/material'
+import { TextField, Checkbox, FormControlLabel } from '@mui/material'
 import ItemCard from './ItemCard';
 import React from 'react'
 
@@ -27,15 +27,18 @@ const FilterDisplay = () => {
     const data = await response.json();
     setVehicleList(data);
     // console.log(vehicleList);
-    // setIsLoading(false);
+    setIsLoading(false);
   }
 //   console.log(vehicleList);
 
   useEffect(() => {
-    // setIsLoading(true);
-    setFilteredVehicleList([...vehicleList]);   
+    setIsLoading(true);
+    setFilteredVehicleList(vehicleList);   
     
-    setFilteredVehicleList(vehicleList.filter((item) => ((truckChecked && item.typeName.toLowerCase().includes("truck"))))); 
+    setFilteredVehicleList(vehicleList.filter((item) => ((item.identification.toLowerCase().includes(searchValue.toLowerCase()) || item.model.toLowerCase().includes(searchValue.toLowerCase()) || item.owner.toLowerCase().includes(searchValue.toLowerCase()))
+                                                         && (truckChecked ? item.typeName.toLowerCase().includes("truck") : true)
+                                                         && (fourSeatersChecked ? item.typeName.toLowerCase().includes("4-seaters") : true)
+                                                         && (sevenSeatersChecked ? item.typeName.toLowerCase().includes("7-seaters") : true)))); 
 
     setIsLoading(false);
 }, [searchValue, truckChecked, sevenSeatersChecked, fourSeatersChecked]); 
@@ -75,12 +78,14 @@ const FilterDisplay = () => {
                 </>
             ) : (
                 <>
-                   {filteredVehicleList.map(element => (
-                    <ItemCard owner={element.owner} id={element.identification} model={element.model} inputTime={element.inputTime} type={element.typeName} />
+                   {filteredVehicleList && (filteredVehicleList.length != 0) ? filteredVehicleList.map(ele => (
+                    <ItemCard key={ele.id} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} />
+                   )) : 
+                    vehicleList.map(ele => (
+                    <ItemCard key={ele.id} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} />
                    ))} 
                 </>
             )}
-            {/* <ItemCard /> */}
         </div>
     </>
   )

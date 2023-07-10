@@ -17,9 +17,13 @@ export async function POST(request: Request){
             owner: body.owner,
             model: body.model,
             typeName: body.type,
-            inputTime: new Date()
+            inputTime: new Date(),
         }
     });
 
     return new Response(JSON.stringify(newVehicle));
+}
+
+export async function DELETE(request: Request){
+
 }
