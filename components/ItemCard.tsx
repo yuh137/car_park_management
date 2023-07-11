@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, CardMedia, Collapse, Avatar, Button, IconButton } from '@mui/material'
+import React, { useState, FormEvent } from 'react'
+import { Card, CardContent, CardHeader, CardMedia, Collapse, Avatar, Button, IconButton, FormControlLabel, Checkbox } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 // const type = "truck";
@@ -11,13 +11,30 @@ interface ItemProps {
   owner: string;
   model: string;
   type: string;
-  inputTime: string
+  inputTime: string;
+  index: number;
 }
 
-const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime }) => {
+const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, index }) => {
   const time: Date = new Date(inputTime);
 
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState<boolean[]>([false]);
+  const [oilServices, setOilServices] = useState<boolean>(false);
+  const [washServices, setWashServices] = useState<boolean>(false);
+
+  function handleClick(index: number){
+    console.log(expanded);
+    setExpanded((prev) => {
+      const newList = [...prev];
+      newList[index] = !newList[index];
+      return newList;
+    });
+    console.log(expanded);
+  }
+
+  function handleSubmit(id: string, inputTime: string){
+    
+  }
 
   return (
     <>
@@ -35,31 +52,43 @@ const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime }) =>
         <div className="content_box relative">
           <CardMedia 
             component="img"
-            image={(type === "Truck") ? "/truck.jfif" : (type === "4-seaters") ? "/4seaters.jfif" : "7seaters.jpg"}
+            image={(type === "Truck") ? "/truck.jfif" : (type === "4-seaters") ? "/4seaters.jfif" : "/7seaters.jpg"}
             className='w-inherit h-[7rem] object-cover'
           />
           <CardContent className="inline-block">
-            
             <p>Parking date: {time.getFullYear()}</p>
             <p>Owner: {owner}</p>
           </CardContent>
-          <IconButton className="inline-block absolute right-0">
-            <MoreVertIcon onClick={() => setExpanded(!expanded)} />
+          {/* <IconButton className="inline-block absolute right-0">
+            <MoreVertIcon onClick={() => {
+              handleClick(index)
+              // console.log(index);  
+            }} />
           </IconButton>
-          <Collapse in={expanded}>
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-            Collapsable
-          </Collapse>
-          {expanded ? (<></>) : (<div className='flex'><Button className="bg-red-500 hover:bg-red-700 ease-in w-fit my-3 mx-auto font-bold text-white">CHECK OUT</Button></div>)}
+          <Collapse in={expanded[index]}>
+            Collapsible
+            Collapsible
+            Collapsible
+            Collapsible
+            Collapsible
+            Collapsible
+            Collapsible
+            Collapsible
+            Collapsible
+            Collapsible
+          </Collapse> */}
+          <form action="">
+            <div className='flex justify-center'>
+              <FormControlLabel control={ <Checkbox value={oilServices} onChange={e => setOilServices(e.target.checked)}/> } label="Oil"/>
+              <FormControlLabel control={ <Checkbox value={washServices} onChange={e => setWashServices(e.target.checked)}/> } label="Wash"/>
+            </div>
+            <div className='flex justify-center'>
+              <Button className="bg-red-500 hover:bg-red-700 ease-in w-fit my-3 mx-auto font-bold text-white" onClick={() => {
+                handleSubmit(id, inputTime);
+              }}>CHECKOUT</Button>
+            </div>
+          </form>
+          {/* {expanded[index] ? (<></>) : (<div className='flex'><Button className="bg-red-500 hover:bg-red-700 ease-in w-fit my-3 mx-auto font-bold text-white">CHECK OUT</Button></div>)} */}
         </div>
       </Card>
     </>

@@ -27,7 +27,7 @@ const AddVehicleButton = () => {
     })
 
     const newVehicle = await res.json();
-    console.log(newVehicle);
+    // console.log(newVehicle);
 
     setVehicleId("");
     setVehicleModel("");

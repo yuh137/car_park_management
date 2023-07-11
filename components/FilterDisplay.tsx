@@ -4,15 +4,17 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { TextField, Checkbox, FormControlLabel } from '@mui/material'
 import ItemCard from './ItemCard';
-import React from 'react'
+import React, { FormEvent } from 'react';
+import { Vehicle } from '@interfaces';
 
 const FilterDisplay = () => {
   const [fourSeatersChecked, setFourCheck] = useState(false);
   const [sevenSeatersChecked, setSevenCheck] = useState(false);
   const [truckChecked, setTruckCheck] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [vehicleList, setVehicleList] = useState([]);
-  const [filteredVehicleList, setFilteredVehicleList] = useState([]);
+  const [vehicleList, setVehicleList] = useState<Vehicle[]>([]);
+  const [filteredVehicleList, setFilteredVehicleList] = useState<Vehicle[]>([]);
+  const [collapsible, setCollapsible] = useState<{[ key: string ]: boolean}>({});
 
   const [isLoading, setIsLoading] = useState(true);
     
@@ -44,6 +46,13 @@ const FilterDisplay = () => {
 }, [searchValue, truckChecked, sevenSeatersChecked, fourSeatersChecked]); 
   console.log(filteredVehicleList);     
 
+  const toggleCollapsible = (elementId: string) => {
+    setCollapsible((prevState) => ({
+      ...prevState,
+      [elementId]: !prevState[elementId],
+    }));
+  };
+  
   return (
     <>
         <div className="search_bar">
@@ -78,11 +87,11 @@ const FilterDisplay = () => {
                 </>
             ) : (
                 <>
-                   {filteredVehicleList && (filteredVehicleList.length != 0) ? filteredVehicleList.map(ele => (
-                    <ItemCard key={ele.id} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} />
+                   {filteredVehicleList && (filteredVehicleList.length != 0) ? filteredVehicleList.map((ele, index) => (
+                    <ItemCard key={index} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
                    )) : 
-                    vehicleList.map(ele => (
-                    <ItemCard key={ele.id} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} />
+                    vehicleList.map((ele, index) => (
+                    <ItemCard key={index} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
                    ))} 
                 </>
             )}
