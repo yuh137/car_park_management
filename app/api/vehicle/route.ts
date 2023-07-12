@@ -16,7 +16,7 @@ export async function POST(request: Request){
             identification: body.id,
             owner: body.owner,
             model: body.model,
-            typeName: body.type,
+            typeName: body.typeName,
             inputTime: new Date(),
         }
     });
@@ -25,5 +25,11 @@ export async function POST(request: Request){
 }
 
 export async function DELETE(request: Request){
+    const body = await request.json();
 
+    const vehicleToDelete = await prisma.vehicle.findUnique({
+        where: {
+            identification: body.identification,
+        }
+    })
 }

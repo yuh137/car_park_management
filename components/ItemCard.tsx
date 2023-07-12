@@ -32,8 +32,16 @@ const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, inde
     console.log(expanded);
   }
 
-  function handleSubmit(id: string, inputTime: string){
-    
+  async function handleCheckout(id: string, inputTime: string){
+    await fetch("http://localhost:3000/api/services", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+          vehicleId: id,
+      })
+    })
   }
 
   return (
@@ -82,9 +90,12 @@ const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, inde
               <FormControlLabel control={ <Checkbox value={oilServices} onChange={e => setOilServices(e.target.checked)}/> } label="Oil"/>
               <FormControlLabel control={ <Checkbox value={washServices} onChange={e => setWashServices(e.target.checked)}/> } label="Wash"/>
             </div>
-            <div className='flex justify-center'>
-              <Button className="bg-red-500 hover:bg-red-700 ease-in w-fit my-3 mx-auto font-bold text-white" onClick={() => {
-                handleSubmit(id, inputTime);
+            <div className='flex justify-center gap-2 m-3'>
+              <Button className='bg-blue-500 hover:bg-blue-700 ease-in w-fit font-bold text-white'>
+                UPDATE
+              </Button>
+              <Button className="bg-red-500 hover:bg-red-700 ease-in w-fit font-bold text-white" onClick={() => {
+                handleCheckout(id, inputTime);
               }}>CHECKOUT</Button>
             </div>
           </form>

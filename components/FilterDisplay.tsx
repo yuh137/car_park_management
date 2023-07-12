@@ -34,7 +34,7 @@ const FilterDisplay = () => {
 //   console.log(vehicleList);
 
   useEffect(() => {
-    setIsLoading(true);
+    // setIsLoading(true);
     setFilteredVehicleList(vehicleList);   
     
     setFilteredVehicleList(vehicleList.filter((item) => ((item.identification.toLowerCase().includes(searchValue.toLowerCase()) || item.model.toLowerCase().includes(searchValue.toLowerCase()) || item.owner.toLowerCase().includes(searchValue.toLowerCase()))
@@ -42,8 +42,8 @@ const FilterDisplay = () => {
                                                          && (fourSeatersChecked ? item.typeName.toLowerCase().includes("4-seaters") : true)
                                                          && (sevenSeatersChecked ? item.typeName.toLowerCase().includes("7-seaters") : true)))); 
 
-    setIsLoading(false);
-}, [searchValue, truckChecked, sevenSeatersChecked, fourSeatersChecked]); 
+    // setIsLoading(false);
+}, [vehicleList, searchValue, truckChecked, sevenSeatersChecked, fourSeatersChecked]); 
   console.log(filteredVehicleList);     
 
   const toggleCollapsible = (elementId: string) => {
@@ -87,12 +87,13 @@ const FilterDisplay = () => {
                 </>
             ) : (
                 <>
-                   {filteredVehicleList && (filteredVehicleList.length != 0) ? filteredVehicleList.map((ele, index) => (
+                   {(filteredVehicleList.length) ? filteredVehicleList.map((ele, index) => (
                     <ItemCard key={index} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
-                   )) : 
-                    vehicleList.map((ele, index) => (
-                    <ItemCard key={index} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
-                   ))} 
+                   )) : (
+                    <>
+                      <p>No items found</p>
+                    </>
+                   )} 
                 </>
             )}
         </div>

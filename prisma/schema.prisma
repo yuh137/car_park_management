@@ -35,7 +35,6 @@ model Services {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   price Float
-  quantity Int
-  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
-  vehicleId String @db.ObjectId
+  vehicle Vehicle @relation(fields: [vehicleId], references: [identification])
+  vehicleId String
 }
