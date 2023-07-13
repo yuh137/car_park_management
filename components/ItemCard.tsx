@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, FormEvent } from 'react'
+import React, { useState, FormEvent, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardMedia, Collapse, Avatar, Button, IconButton, FormControlLabel, Checkbox } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
@@ -15,12 +15,33 @@ interface ItemProps {
   index: number;
 }
 
+interface oilService {
+  vehicleId: string;
+  used: boolean;
+}
+
+interface washService {
+  vehicleId: string;
+  used: boolean;
+}
+
 const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, index }) => {
   const time: Date = new Date(inputTime);
 
   const [expanded, setExpanded] = useState<boolean[]>([false]);
-  const [oilServices, setOilServices] = useState<boolean>(false);
-  const [washServices, setWashServices] = useState<boolean>(false);
+  const [oilServices, setOilServices] = useState<oilService>({ vehicleId: id, used: true });
+  const [washServices, setWashServices] = useState<washService>({ vehicleId: id, used: true });
+
+  useEffect(() => {
+    const oilStorage = localStorage.getItem(`oil:${id}`);
+    if (oilStorage !== null) {
+      const oil: oilService = JSON.parse(oilStorage);
+      (oil.used ? setOilServices({ ...oil, used: true }) : setOilServices({...oil, used: false }));
+      console.log(oilServices);
+    } else {
+      setOilServices({ vehicleId: id, used: false });
+    }
+  }, []);
 
   function handleClick(index: number){
     console.log(expanded);
@@ -33,15 +54,9 @@ const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, inde
   }
 
   async function handleCheckout(id: string, inputTime: string){
-    await fetch("http://localhost:3000/api/services", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-          vehicleId: id,
-      })
-    })
+    const res = await fetch(`http://localhost:3000/api/services/${id}`);
+
+    console.log(res);
   }
 
   return (
@@ -87,8 +102,8 @@ const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, inde
           </Collapse> */}
           <form action="">
             <div className='flex justify-center'>
-              <FormControlLabel control={ <Checkbox value={oilServices} onChange={e => setOilServices(e.target.checked)}/> } label="Oil"/>
-              <FormControlLabel control={ <Checkbox value={washServices} onChange={e => setWashServices(e.target.checked)}/> } label="Wash"/>
+              <FormControlLabel control={ <Checkbox checked={oilServices.used} value={oilServices.used} onChange={e => {setOilServices({ vehicleId: id, used: e.target.checked }); localStorage.setItem(`oil:${id}`, (JSON.stringify({ vehicleId: id, used: e.target.checked })))}}/> } label="Oil"/>
+              <FormControlLabel control={ <Checkbox value={washServices.used} onChange={e => {setWashServices({ vehicleId: id, used: e.target.checked }); localStorage.setItem(`wash:${id}`, (JSON.stringify({ vehicleId: id, used: e.target.checked })))}}/> } label="Wash"/>
             </div>
             <div className='flex justify-center gap-2 m-3'>
               <Button className='bg-blue-500 hover:bg-blue-700 ease-in w-fit font-bold text-white'>
