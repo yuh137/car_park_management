@@ -2,12 +2,12 @@
 
 import React, { useState, FormEvent, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardMedia, Collapse, Avatar, Button, IconButton, FormControlLabel, Checkbox } from '@mui/material'
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Service } from '@interfaces'
 
 // const type = "truck";
 
 interface ItemProps {
-  id: string;
+  vehicleId: string;
   owner: string;
   model: string;
   type: string;
@@ -25,36 +25,68 @@ interface washService {
   used: boolean;
 }
 
-const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, index }) => {
+const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTime, index }) => {
   const time: Date = new Date(inputTime);
 
-  const [expanded, setExpanded] = useState<boolean[]>([false]);
-  const [oilServices, setOilServices] = useState<oilService>({ vehicleId: id, used: true });
-  const [washServices, setWashServices] = useState<washService>({ vehicleId: id, used: true });
+  const [oilServices, setOilServices] = useState<oilService>({ vehicleId: vehicleId, used: false });
+  const [washServices, setWashServices] = useState<washService>({ vehicleId: vehicleId, used: false });
 
   useEffect(() => {
-    const oilStorage = localStorage.getItem(`oil:${id}`);
+    const oilStorage = localStorage.getItem(`oil:${vehicleId}`);
     if (oilStorage !== null) {
       const oil: oilService = JSON.parse(oilStorage);
       (oil.used ? setOilServices({ ...oil, used: true }) : setOilServices({...oil, used: false }));
       console.log(oilServices);
     } else {
-      setOilServices({ vehicleId: id, used: false });
+      setOilServices({ vehicleId: vehicleId, used: false });
+    }
+
+    const washStorage = localStorage.getItem(`wash:${vehicleId}`);
+    if (washStorage !== null) {
+      const wash: washService = JSON.parse(washStorage);
+      (wash.used ? setWashServices({ ...wash, used: true }) : setWashServices({...wash, used: false }));
+      console.log(washServices);
+    } else {
+      setWashServices({ vehicleId: vehicleId, used: false });
     }
   }, []);
 
-  function handleClick(index: number){
-    console.log(expanded);
-    setExpanded((prev) => {
-      const newList = [...prev];
-      newList[index] = !newList[index];
-      return newList;
-    });
-    console.log(expanded);
+  async function handleUpdate(vehicleId: string){
+    const res = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
+
+    const vehicleServices: Service[] = await res.json();
+    const wash = vehicleServices.find(item => item.serviceName === 'wash');
+
+    if (washServices.used) {
+      if (wash === undefined) {
+        const newWash = await fetch('http://localhost:3000/api/services', {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            vehicleId: vehicleId,
+            name: "wash",
+            price: washingCost
+          })
+        })
+
+        console.log( (await newWash.json()) )
+      }
+
+      localStorage.setItem(`oil:${vehicleId}`, (JSON.stringify({ vehicleId: vehicleId, used: washServices.used })));
+    } else if (!washServices.used) {
+      if (wash) {
+        const deleteWash = await fetch(`http://localhost:3000/api/services/${wash.id}`, {
+          method: "DELETE",
+          headers: { "COntent_Type": "application/json"}
+        })
+
+        console.log( (await deleteWash.json()) );
+      }
+    }
   }
 
-  async function handleCheckout(id: string, inputTime: string){
-    const res = await fetch(`http://localhost:3000/api/services/${id}`);
+  async function handleCheckout(vehicleId: string, inputTime: string){
+    const res = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
 
     console.log(res);
   }
@@ -69,7 +101,7 @@ const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, inde
               src="/avatar.jfif"
             />
           }
-          title={id}
+          title={vehicleId}
           subheader={model}
         />
         <div className="content_box relative">
@@ -82,35 +114,19 @@ const ItemCard: React.FC<ItemProps> = ({ id, owner, type, model, inputTime, inde
             <p>Parking date: {time.getFullYear()}</p>
             <p>Owner: {owner}</p>
           </CardContent>
-          {/* <IconButton className="inline-block absolute right-0">
-            <MoreVertIcon onClick={() => {
-              handleClick(index)
-              // console.log(index);  
-            }} />
-          </IconButton>
-          <Collapse in={expanded[index]}>
-            Collapsible
-            Collapsible
-            Collapsible
-            Collapsible
-            Collapsible
-            Collapsible
-            Collapsible
-            Collapsible
-            Collapsible
-            Collapsible
-          </Collapse> */}
           <form action="">
             <div className='flex justify-center'>
-              <FormControlLabel control={ <Checkbox checked={oilServices.used} value={oilServices.used} onChange={e => {setOilServices({ vehicleId: id, used: e.target.checked }); localStorage.setItem(`oil:${id}`, (JSON.stringify({ vehicleId: id, used: e.target.checked })))}}/> } label="Oil"/>
-              <FormControlLabel control={ <Checkbox value={washServices.used} onChange={e => {setWashServices({ vehicleId: id, used: e.target.checked }); localStorage.setItem(`wash:${id}`, (JSON.stringify({ vehicleId: id, used: e.target.checked })))}}/> } label="Wash"/>
+              <FormControlLabel control={ <Checkbox checked={oilServices.used} value={oilServices.used} onChange={e => {setOilServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Oil"/>
+              <FormControlLabel control={ <Checkbox checked={washServices.used} value={washServices.used} onChange={e => {setWashServices({ vehicleId: vehicleId, used: e.target.checked }); localStorage.setItem(`wash:${vehicleId}`, (JSON.stringify({ vehicleId: vehicleId, used: e.target.checked })))}}/> } label="Wash"/>
             </div>
             <div className='flex justify-center gap-2 m-3'>
-              <Button className='bg-blue-500 hover:bg-blue-700 ease-in w-fit font-bold text-white'>
+              <Button className='bg-blue-500 hover:bg-blue-700 ease-in w-fit font-bold text-white' onClick={() => {
+                handleUpdate(vehicleId);
+              }}>
                 UPDATE
               </Button>
               <Button className="bg-red-500 hover:bg-red-700 ease-in w-fit font-bold text-white" onClick={() => {
-                handleCheckout(id, inputTime);
+                handleCheckout(vehicleId, inputTime);
               }}>CHECKOUT</Button>
             </div>
           </form>

@@ -44,7 +44,7 @@ const FilterDisplay = () => {
 
     // setIsLoading(false);
 }, [vehicleList, searchValue, truckChecked, sevenSeatersChecked, fourSeatersChecked]); 
-  console.log(filteredVehicleList);     
+  // console.log(filteredVehicleList);     
 
   const toggleCollapsible = (elementId: string) => {
     setCollapsible((prevState) => ({
@@ -88,7 +88,7 @@ const FilterDisplay = () => {
             ) : (
                 <>
                    {(filteredVehicleList.length) ? filteredVehicleList.map((ele, index) => (
-                    <ItemCard key={index} owner={ele.owner} id={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
+                    <ItemCard key={index} owner={ele.owner} vehicleId={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
                    )) : (
                     <>
                       <p>No items found</p>
