@@ -7,6 +7,14 @@ export interface Vehicle {
     inputTime: string;
 }
 
+export interface Admin {
+    id: string;
+    username: string;
+    password: string;
+    createdAt: string;
+    totalIncome: number;
+}
+
 export interface RequestBody {
     username: string,
     password: string

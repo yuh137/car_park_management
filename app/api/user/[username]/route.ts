@@ -5,12 +5,11 @@ export async function GET(request: NextApiRequest, { params }: { params: { usern
     // const body = await request.json();
     const id = params.username;
 
-    const res = await prisma.admin.findFirst({
+    const user = await prisma.admin.findFirst({
         where: {
             username: id,
         }
     })
-    // const services = await res.json();
 
-    return new Response(JSON.stringify(res));
+    return new Response(JSON.stringify(user));
 } 

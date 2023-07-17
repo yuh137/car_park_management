@@ -19,14 +19,14 @@ const AddVehicleButton = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            id: vehicleId,
+            identification: vehicleId,
             model: vehicleModel,
             owner: vehicleOwner,
-            type: type
+            typeName: type
         })
     })
 
-    const newVehicle = await res.json();
+    // const newVehicle = await res.json();
     // console.log(newVehicle);
 
     setVehicleId("");

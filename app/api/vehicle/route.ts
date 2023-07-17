@@ -13,7 +13,7 @@ export async function POST(request: Request){
     const newVehicle = await prisma.vehicle.create({
         data: {
             admin: {connect: { id: "64a3e5cd89c2a7c399bb4482"}},
-            identification: body.id,
+            identification: body.identification,
             owner: body.owner,
             model: body.model,
             typeName: body.typeName,

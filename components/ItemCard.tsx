@@ -3,6 +3,7 @@
 import React, { useState, FormEvent, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardMedia, Collapse, Avatar, Button, IconButton, FormControlLabel, Checkbox } from '@mui/material'
 import { Service } from '@interfaces'
+import '@globals'
 
 // const type = "truck";
 
@@ -56,15 +57,16 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
 
     const vehicleServices: Service[] = await res.json();
     const wash = vehicleServices.find(item => item.serviceName === 'wash');
+    const oil = vehicleServices.find(item => item.serviceName === 'oil');
 
     if (washServices.used) {
-      if (wash === undefined) {
+      if (!wash) {
         const newWash = await fetch('http://localhost:3000/api/services', {
           method: 'POST',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             vehicleId: vehicleId,
-            name: "wash",
+            serviceName: "wash",
             price: washingCost
           })
         })
@@ -72,23 +74,55 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
         console.log( (await newWash.json()) )
       }
 
-      localStorage.setItem(`oil:${vehicleId}`, (JSON.stringify({ vehicleId: vehicleId, used: washServices.used })));
+      localStorage.setItem(`wash:${vehicleId}`, (JSON.stringify({ vehicleId: vehicleId, used: washServices.used })));
     } else if (!washServices.used) {
       if (wash) {
-        const deleteWash = await fetch(`http://localhost:3000/api/services/${wash.id}`, {
+        const deleteWash = await fetch(`http://localhost:3000/api/services/${wash.vehicleId}/wash`, {
           method: "DELETE",
-          headers: { "COntent_Type": "application/json"}
+          headers: { "Content_Type": "application/json"}
         })
 
         console.log( (await deleteWash.json()) );
+        localStorage.removeItem(`wash:${vehicleId}`);
+      }
+
+      // localStorage.setItem(`wash:${vehicleId}`, (JSON.stringify({ vehicleId: vehicleId, used: washServices.used })));
+    }
+
+    if (oilServices.used) {
+      if (!oil) {
+        const newOil = await fetch(`http://localhost:3000/api/services`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            vehicleId: vehicleId,
+            serviceName: "oil",
+            price: oilCost
+          })
+        })
+
+        console.log( (await newOil.json()) );
+      }
+
+      localStorage.setItem(`oil:${vehicleId}`, (JSON.stringify({ vehicleId: vehicleId, used: oilServices.used })));
+    } else if (!oilServices.used) {
+      if (oil) {
+        const deleteOil = await fetch(`http://localhost:3000/api/services/${oil.vehicleId}/oil`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        })
+
+        console.log( (await deleteOil.json()) );
+        localStorage.removeItem(`oil:${vehicleId}`);
       }
     }
   }
 
   async function handleCheckout(vehicleId: string, inputTime: string){
     const res = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
+    const services: Service[] = await res.json();
 
-    console.log(res);
+    console.log(services);
   }
 
   return (
@@ -111,13 +145,13 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
             className='w-inherit h-[7rem] object-cover'
           />
           <CardContent className="inline-block">
-            <p>Parking date: {time.getFullYear()}</p>
+            <p>Parking date: {time.getDate()}/{time.getMonth() + 1}/{time.getFullYear()}</p>
             <p>Owner: {owner}</p>
           </CardContent>
           <form action="">
             <div className='flex justify-center'>
               <FormControlLabel control={ <Checkbox checked={oilServices.used} value={oilServices.used} onChange={e => {setOilServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Oil"/>
-              <FormControlLabel control={ <Checkbox checked={washServices.used} value={washServices.used} onChange={e => {setWashServices({ vehicleId: vehicleId, used: e.target.checked }); localStorage.setItem(`wash:${vehicleId}`, (JSON.stringify({ vehicleId: vehicleId, used: e.target.checked })))}}/> } label="Wash"/>
+              <FormControlLabel control={ <Checkbox checked={washServices.used} value={washServices.used} onChange={e => {setWashServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Wash"/>
             </div>
             <div className='flex justify-center gap-2 m-3'>
               <Button className='bg-blue-500 hover:bg-blue-700 ease-in w-fit font-bold text-white' onClick={() => {

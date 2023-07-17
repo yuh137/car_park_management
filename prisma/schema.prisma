@@ -36,5 +36,5 @@ model Services {
   serviceName String
   price Float
   vehicle Vehicle @relation(fields: [vehicleId], references: [identification])
-  vehicleId String @unique
+  vehicleId String 
 }

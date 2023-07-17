@@ -6,11 +6,6 @@ interface RequestBody {
     password: string
 }
 
-export async function GET(request: Request){
-    
-    
-}
-
 export async function POST(request: Request){
     const body: RequestBody = await request.json();
     

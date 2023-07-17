@@ -17,6 +17,7 @@ export async function GET(request: NextApiRequest, { params }: { params: { vehic
 
 export async function DELETE(request: Request, { params }: { params: { vehicleId: string } }){
     const vehicleId = params.vehicleId;
+    
 
     const res = await prisma.services.deleteMany({
         where: {
