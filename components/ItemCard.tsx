@@ -2,8 +2,9 @@
 
 import React, { useState, FormEvent, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardMedia, Collapse, Avatar, Button, IconButton, FormControlLabel, Checkbox } from '@mui/material'
-import { Service } from '@interfaces'
+import { Service, Vehicle } from '@interfaces'
 import '@globals'
+import { validateTime } from '@controllers/validateTime'
 
 // const type = "truck";
 
@@ -14,6 +15,11 @@ interface ItemProps {
   type: string;
   inputTime: string;
   index: number;
+
+  oilServices: oilService[];
+  washServices: washService[];
+  setOilServices: React.Dispatch<React.SetStateAction<oilService[]>>;
+  setWashServices: React.Dispatch<React.SetStateAction<washService[]>>;
 }
 
 interface oilService {
@@ -26,18 +32,25 @@ interface washService {
   used: boolean;
 }
 
-const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTime, index }) => {
+const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTime, index, oilServices, setOilServices, washServices, setWashServices }) => {
   const time: Date = new Date(inputTime);
 
-  const [oilServices, setOilServices] = useState<oilService>({ vehicleId: vehicleId, used: false });
-  const [washServices, setWashServices] = useState<washService>({ vehicleId: vehicleId, used: false });
+  // const [oilServices, setOilServices] = useState<oilService>({ vehicleId: vehicleId, used: false });
+  // const [washServices, setWashServices] = useState<washService>({ vehicleId: vehicleId, used: false });
 
+  function updateOilServices(vehicleId: string, used: boolean){
+    setOilServices((prevState) => prevState.map((item) =>
+      item.vehicleId === vehicleId ? { ...item, used: used } : item
+    ));
+  };
+
+  // LOAD PREVIOUS STATE OF OIL AND WASH SERVICES
   useEffect(() => {
     const oilStorage = localStorage.getItem(`oil:${vehicleId}`);
     if (oilStorage !== null) {
       const oil: oilService = JSON.parse(oilStorage);
       (oil.used ? setOilServices({ ...oil, used: true }) : setOilServices({...oil, used: false }));
-      console.log(oilServices);
+      // console.log(oilServices);
     } else {
       setOilServices({ vehicleId: vehicleId, used: false });
     }
@@ -46,12 +59,17 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
     if (washStorage !== null) {
       const wash: washService = JSON.parse(washStorage);
       (wash.used ? setWashServices({ ...wash, used: true }) : setWashServices({...wash, used: false }));
-      console.log(washServices);
+      // console.log(washServices);
     } else {
       setWashServices({ vehicleId: vehicleId, used: false });
     }
   }, []);
 
+  useEffect(() => {
+    
+  }, [])
+
+  // UPDATE AND SAVE OIL AND WASH SERVICE INSTANCES
   async function handleUpdate(vehicleId: string){
     const res = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
 
@@ -118,11 +136,19 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
     }
   }
 
-  async function handleCheckout(vehicleId: string, inputTime: string){
-    const res = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
-    const services: Service[] = await res.json();
+  async function handleCheckout(vehicleId: string){
+    const serviceRes = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
+    const services: Service[] = await serviceRes.json();
 
-    console.log(services);
+    const vehicleRes = await fetch(`http://localhost:3000/api/vehicle/${vehicleId}`);
+    const vehicle: Vehicle = await vehicleRes.json();
+
+    // validateTime();
+    // console.log(time);
+    const newTest = [...testState];
+    newTest[index] = 12;
+    setTestState(newTest);
+    // console.log(services);
   }
 
   return (
@@ -160,7 +186,7 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
                 UPDATE
               </Button>
               <Button className="bg-red-500 hover:bg-red-700 ease-in w-fit font-bold text-white" onClick={() => {
-                handleCheckout(vehicleId, inputTime);
+                handleCheckout(vehicleId);
               }}>CHECKOUT</Button>
             </div>
           </form>

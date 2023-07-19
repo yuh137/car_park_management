@@ -1,5 +1,6 @@
 import React from 'react'
 import Navbar from '@components/Navbar'
+import Footer from '@components/Footer'
 import Provider from '@components/Provider'
 import MUIThemeProvider from '@components/ThemeProvider'
 import '@styles/global.css'
@@ -20,6 +21,7 @@ const RootLayout = ( { children, }
             <main className="app">
                 <Navbar />
                 {children}
+                <Footer />
             </main>
           </MUIThemeProvider>
         </Provider>
