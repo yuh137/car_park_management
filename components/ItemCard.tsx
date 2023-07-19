@@ -16,10 +16,10 @@ interface ItemProps {
   inputTime: string;
   index: number;
 
-  oilServices: oilService[];
-  washServices: washService[];
-  setOilServices: React.Dispatch<React.SetStateAction<oilService[]>>;
-  setWashServices: React.Dispatch<React.SetStateAction<washService[]>>;
+  // oilServices: oilService[];
+  // washServices: washService[];
+  // setOilServices: React.Dispatch<React.SetStateAction<oilService[]>>;
+  // setWashServices: React.Dispatch<React.SetStateAction<washService[]>>;
 }
 
 interface oilService {
@@ -32,17 +32,17 @@ interface washService {
   used: boolean;
 }
 
-const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTime, index, oilServices, setOilServices, washServices, setWashServices }) => {
+const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTime, index }) => {
   const time: Date = new Date(inputTime);
 
-  // const [oilServices, setOilServices] = useState<oilService>({ vehicleId: vehicleId, used: false });
-  // const [washServices, setWashServices] = useState<washService>({ vehicleId: vehicleId, used: false });
+  const [oilServices, setOilServices] = useState<oilService>({ vehicleId: vehicleId, used: false });
+  const [washServices, setWashServices] = useState<washService>({ vehicleId: vehicleId, used: false });
 
-  function updateOilServices(vehicleId: string, used: boolean){
-    setOilServices((prevState) => prevState.map((item) =>
-      item.vehicleId === vehicleId ? { ...item, used: used } : item
-    ));
-  };
+  // function updateOilServices(vehicleId: string, used: boolean){
+  //   setOilServices((prevState) => prevState.map((item) =>
+  //     item.vehicleId === vehicleId ? { ...item, used: used } : item
+  //   ));
+  // };
 
   // LOAD PREVIOUS STATE OF OIL AND WASH SERVICES
   useEffect(() => {
@@ -140,15 +140,13 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
     const serviceRes = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
     const services: Service[] = await serviceRes.json();
 
-    const vehicleRes = await fetch(`http://localhost:3000/api/vehicle/${vehicleId}`);
-    const vehicle: Vehicle = await vehicleRes.json();
+    let servicesFee = 0;
+    services.forEach(service => servicesFee += service.price);
 
-    // validateTime();
-    // console.log(time);
-    const newTest = [...testState];
-    newTest[index] = 12;
-    setTestState(newTest);
-    // console.log(services);
+    const daysParked = validateTime(time);
+    const parkingFee = ((type === "Truck") ? parkingCostTruck : (type === "4-seaters") ? parkingCost4 : parkingCost7) * daysParked;
+    // const checkOutFee = parkingFee + 
+    console.log(servicesFee, parkingFee);
   }
 
   return (
@@ -176,8 +174,8 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
           </CardContent>
           <form action="">
             <div className='flex justify-center'>
-              <FormControlLabel control={ <Checkbox checked={oilServices.used} value={oilServices.used} onChange={e => {setOilServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Oil"/>
-              <FormControlLabel control={ <Checkbox checked={washServices.used} value={washServices.used} onChange={e => {setWashServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Wash"/>
+              <FormControlLabel control={ <Checkbox checked={oilServices.used} value={oilServices.used} onChange={e => {e.preventDefault(); setOilServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Oil"/>
+              <FormControlLabel control={ <Checkbox checked={washServices.used} value={washServices.used} onChange={e => {e.preventDefault(); setWashServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Wash"/>
             </div>
             <div className='flex justify-center gap-2 m-3'>
               <Button className='bg-blue-500 hover:bg-blue-700 ease-in w-fit font-bold text-white' onClick={() => {

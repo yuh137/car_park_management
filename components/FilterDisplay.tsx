@@ -26,10 +26,10 @@ const FilterDisplay = () => {
   const [vehicleList, setVehicleList] = useState<Vehicle[]>([]);
   const [filteredVehicleList, setFilteredVehicleList] = useState<Vehicle[]>([]);
   const [slicedVehicleList, setSlicedVehicleList] = useState<Vehicle[]>([]);
-  const [testState, setTestState] = useState<number[]>([]);
+  // const [testState, setTestState] = useState<number[]>([]);
 
-  const [oilServices, setOilServices] = useState<oilService[]>([]);
-  const [washServices, setWashServices] = useState<washService[]>([]);
+  // const [oilServices, setOilServices] = useState<oilService[]>([]);
+  // const [washServices, setWashServices] = useState<washService[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
     
@@ -106,7 +106,7 @@ const FilterDisplay = () => {
               ) : (
                   <>
                     {(slicedVehicleList.length) ? slicedVehicleList.map((ele, index) => (
-                      <ItemCard key={index} owner={ele.owner} vehicleId={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index} oilServices={oilServices} setOilServices={setOilServices} washServices={washServices} setWashServices={setWashServices}/>
+                      <ItemCard key={index} owner={ele.owner} vehicleId={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
                     )) : (
                       <>
                         <p>No items found</p>
