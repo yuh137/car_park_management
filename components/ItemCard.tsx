@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, FormEvent, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardMedia, Collapse, Avatar, Button, IconButton, FormControlLabel, Checkbox } from '@mui/material'
+import { Card, CardContent, CardHeader, CardMedia, Avatar, Button, IconButton, FormControlLabel, Checkbox, Snackbar, Alert } from '@mui/material'
 import { Service, Vehicle } from '@interfaces'
 import '@globals'
 import { validateTime } from '@controllers/validateTime'
@@ -15,6 +15,8 @@ interface ItemProps {
   type: string;
   inputTime: string;
   index: number;
+  oilUsed: boolean;
+  washUsed: boolean;
 
   // oilServices: oilService[];
   // washServices: washService[];
@@ -32,11 +34,18 @@ interface washService {
   used: boolean;
 }
 
-const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTime, index }) => {
+const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTime, index, oilUsed, washUsed }) => {
   const time: Date = new Date(inputTime);
 
   const [oilServices, setOilServices] = useState<oilService>({ vehicleId: vehicleId, used: false });
   const [washServices, setWashServices] = useState<washService>({ vehicleId: vehicleId, used: false });
+
+  const [parkingFee, setParkingFee] = useState(0);
+  const [servicesFee, setServicesFee] = useState(0);
+  const [totalFee, setTotalFee] = useState(0);
+
+  const [openSuccessSnackbar, setOpenSuccessSnackBar] = useState(false);
+  const [openUpdateSnackbar, setOpenUpdateSnackBar] = useState(false);
 
   // function updateOilServices(vehicleId: string, used: boolean){
   //   setOilServices((prevState) => prevState.map((item) =>
@@ -46,28 +55,33 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
 
   // LOAD PREVIOUS STATE OF OIL AND WASH SERVICES
   useEffect(() => {
-    const oilStorage = localStorage.getItem(`oil:${vehicleId}`);
-    if (oilStorage !== null) {
-      const oil: oilService = JSON.parse(oilStorage);
-      (oil.used ? setOilServices({ ...oil, used: true }) : setOilServices({...oil, used: false }));
-      // console.log(oilServices);
-    } else {
-      setOilServices({ vehicleId: vehicleId, used: false });
-    }
+    // const oilStorage = localStorage.getItem(`oil:${vehicleId}`);
+    // if (oilStorage !== null) {
+    //   const oil: oilService = JSON.parse(oilStorage);
+    //   (oil.used ? setOilServices({ ...oil, used: true }) : setOilServices({...oil, used: false }));
+    //   // console.log(oilServices);
+    // } else {
+    //   setOilServices({ vehicleId: vehicleId, used: false });
+    // }
 
-    const washStorage = localStorage.getItem(`wash:${vehicleId}`);
-    if (washStorage !== null) {
-      const wash: washService = JSON.parse(washStorage);
-      (wash.used ? setWashServices({ ...wash, used: true }) : setWashServices({...wash, used: false }));
-      // console.log(washServices);
-    } else {
-      setWashServices({ vehicleId: vehicleId, used: false });
-    }
+    // const washStorage = localStorage.getItem(`wash:${vehicleId}`);
+    // if (washStorage !== null) {
+    //   const wash: washService = JSON.parse(washStorage);
+    //   (wash.used ? setWashServices({ ...wash, used: true }) : setWashServices({...wash, used: false }));
+    //   // console.log(washServices);
+    // } else {
+    //   setWashServices({ vehicleId: vehicleId, used: false });
+    // }
+    setOilServices({ vehicleId: vehicleId, used: oilUsed });
+    setWashServices({ vehicleId: vehicleId, used: washUsed });
+    // console.log(`${vehicleId}`)
   }, []);
 
   useEffect(() => {
-    
-  }, [])
+    // console.log(parkingFee, servicesFee);
+    setTotalFee(servicesFee + parkingFee);
+    // console.log(parkingFee, servicesFee);
+  }, [parkingFee, servicesFee]);
 
   // UPDATE AND SAVE OIL AND WASH SERVICE INSTANCES
   async function handleUpdate(vehicleId: string){
@@ -134,19 +148,26 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
         localStorage.removeItem(`oil:${vehicleId}`);
       }
     }
+
+    setOpenUpdateSnackBar(true);
   }
 
-  async function handleCheckout(vehicleId: string){
-    const serviceRes = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
-    const services: Service[] = await serviceRes.json();
+  function handleCheckout(vehicleId: string){
+    const serviceRes = fetch(`http://localhost:3000/api/services/${vehicleId}`);
+    let services: Service[];
+    serviceRes.then(res => res.json()).then(data => {
+      services = data
+      services.forEach(service => setServicesFee(prevState => prevState + service.price));  
+    });
 
-    let servicesFee = 0;
-    services.forEach(service => servicesFee += service.price);
+    // let servicesFee = 0;
+    // services.forEach(service => setServicesFee(prevState => prevState + service.price));
 
     const daysParked = validateTime(time);
-    const parkingFee = ((type === "Truck") ? parkingCostTruck : (type === "4-seaters") ? parkingCost4 : parkingCost7) * daysParked;
-    // const checkOutFee = parkingFee + 
-    console.log(servicesFee, parkingFee);
+    // const parkingFee = ((type === "Truck") ? parkingCostTruck : (type === "4-seaters") ? parkingCost4 : parkingCost7) * daysParked;
+    setParkingFee(((type === "Truck") ? parkingCostTruck : (type === "4-seaters") ? parkingCost4 : parkingCost7) * daysParked); //
+    // setOpenSuccessSnackBar(true);
+    // console.log(servicesFee, parkingFee);    
   }
 
   return (
@@ -174,8 +195,8 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
           </CardContent>
           <form action="">
             <div className='flex justify-center'>
-              <FormControlLabel control={ <Checkbox checked={oilServices.used} value={oilServices.used} onChange={e => {e.preventDefault(); setOilServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Oil"/>
-              <FormControlLabel control={ <Checkbox checked={washServices.used} value={washServices.used} onChange={e => {e.preventDefault(); setWashServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Wash"/>
+              <FormControlLabel control={ <Checkbox key={`${vehicleId}-oil`} checked={oilServices.used} value={oilServices.used} onChange={e => {e.preventDefault(); setOilServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Oil"/>
+              <FormControlLabel control={ <Checkbox key={`${vehicleId}-wash`} checked={washServices.used} value={washServices.used} onChange={e => {e.preventDefault(); setWashServices({ vehicleId: vehicleId, used: e.target.checked }); }}/> } label="Wash"/>
             </div>
             <div className='flex justify-center gap-2 m-3'>
               <Button className='bg-blue-500 hover:bg-blue-700 ease-in w-fit font-bold text-white' onClick={() => {
@@ -185,12 +206,45 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
               </Button>
               <Button className="bg-red-500 hover:bg-red-700 ease-in w-fit font-bold text-white" onClick={() => {
                 handleCheckout(vehicleId);
+                fetch(`http://localhost:3000/api/user/John`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    newIncome: (servicesFee + parkingFee),
+                  })
+                })
+                setOpenSuccessSnackBar(true);
+                // console.log(servicesFee, parkingFee);
+                // const totalFee = servicesFee + parkingFee;
               }}>CHECKOUT</Button>
             </div>
           </form>
           {/* {expanded[index] ? (<></>) : (<div className='flex'><Button className="bg-red-500 hover:bg-red-700 ease-in w-fit my-3 mx-auto font-bold text-white">CHECK OUT</Button></div>)} */}
         </div>
       </Card>
+      {/* <Alert onClose={() => {}} severity='success' variant='filled'>Test alert</Alert> */}
+      <Snackbar
+        open={openSuccessSnackbar}
+        onClose={() => setOpenSuccessSnackBar(false)}
+        anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+        autoHideDuration={3000}
+        key={`${vehicleId}-success`}
+      >
+        <Alert severity='success' variant='filled'>
+          Vehicle has successfully checked out, total fee is <strong>{servicesFee + parkingFee}</strong> 
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openUpdateSnackbar}
+        onClose={() => setOpenUpdateSnackBar(false)}
+        anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+        autoHideDuration={3000}
+        key={`${vehicleId}-update`}
+      >
+        <Alert severity='info' variant='filled'>
+          Vehicle has successfully been updated
+        </Alert>
+      </Snackbar>
     </>
   )
 }

@@ -50,7 +50,7 @@ const FilterDisplay = () => {
 
   useEffect(() => {
     // setIsLoading(true);
-    setFilteredVehicleList(vehicleList);   
+    // setFilteredVehicleList(vehicleList);   
     
     setFilteredVehicleList(vehicleList.filter((item) => ((item.identification.toLowerCase().includes(searchValue.toLowerCase()) || item.model.toLowerCase().includes(searchValue.toLowerCase()) || item.owner.toLowerCase().includes(searchValue.toLowerCase()))
                                                          && (truckChecked ? item.typeName.toLowerCase().includes("truck") : true)
@@ -58,14 +58,19 @@ const FilterDisplay = () => {
                                                          && (sevenSeatersChecked ? item.typeName.toLowerCase().includes("7-seaters") : true)))); 
 
     // setIsLoading(false);
+    // console.log("from update", filteredVehicleList)
 }, [vehicleList, searchValue, truckChecked, sevenSeatersChecked, fourSeatersChecked]); 
+
+  useEffect(() => {
+    console.log("from check", filteredVehicleList);
+  }, [filteredVehicleList])
   // console.log(filteredVehicleList);     
 
   useEffect(() => {
-    setSlicedVehicleList(filteredVehicleList);
+    // setSlicedVehicleList(filteredVehicleList);
 
     setSlicedVehicleList(filteredVehicleList.slice((currentPage - 1) * 8, currentPage * 8));
-  }, [filteredVehicleList, currentPage])
+  }, [filteredVehicleList, currentPage]) 
 
   
   return (
@@ -105,9 +110,30 @@ const FilterDisplay = () => {
                   </>
               ) : (
                   <>
-                    {(slicedVehicleList.length) ? slicedVehicleList.map((ele, index) => (
-                      <ItemCard key={index} owner={ele.owner} vehicleId={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index}/>
-                    )) : (
+                    {(slicedVehicleList.length) ? slicedVehicleList.map((ele, index) => {
+                      let oilUsed = false;
+                      let washUsed = false;
+
+                      const oilStorage = localStorage.getItem(`oil:${ele.identification}`);
+                      if (oilStorage !== null) {
+                        const oil: oilService = JSON.parse(oilStorage);
+                        (oil.used ? oilUsed = true : oilUsed = false);
+                        // console.log(oilServices);
+                      } else {
+                        oilUsed = false;
+                      }
+                  
+                      const washStorage = localStorage.getItem(`wash:${ele.identification}`);
+                      if (washStorage !== null) {
+                        const wash: washService = JSON.parse(washStorage);
+                        (wash.used ? washUsed = true : washUsed = false);
+                        // console.log(washServices);
+                      } else {
+                        washUsed = false;
+                      }
+                      return (
+                      <ItemCard key={index} owner={ele.owner} vehicleId={ele.identification} model={ele.model} inputTime={ele.inputTime} type={ele.typeName} index={index} oilUsed={oilUsed} washUsed={washUsed}/>
+                    )}) : (
                       <>
                         <p>No items found</p>
                       </>
