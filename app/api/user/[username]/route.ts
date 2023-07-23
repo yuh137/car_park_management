@@ -21,14 +21,15 @@ export async function POST(request: Request, { params }: { params: { username: s
     const name = params.username;
     const body: updateRequestBody = await request.json();
 
-    const user = await prisma.admin.updateMany({
+    const user = await prisma.admin.update({
         where: {
-            username: name
+            username: name,
         },
         data: {
             totalIncome: {
                 increment: body.newIncome
-            }
+            },
+            lastVehicle: body.newIncome,
         }
     })
 

@@ -168,3 +168,7 @@
 .flex-between {
   @apply flex justify-between items-center;
 }
+
+.footer-social>* {
+  @apply w-[28px] h-[28px] cursor-pointer
+}

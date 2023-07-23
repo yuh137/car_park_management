@@ -61,9 +61,6 @@ const FilterDisplay = () => {
     // console.log("from update", filteredVehicleList)
 }, [vehicleList, searchValue, truckChecked, sevenSeatersChecked, fourSeatersChecked]); 
 
-  useEffect(() => {
-    console.log("from check", filteredVehicleList);
-  }, [filteredVehicleList])
   // console.log(filteredVehicleList);     
 
   useEffect(() => {

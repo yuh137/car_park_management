@@ -13,11 +13,7 @@ export interface Admin {
     password: string;
     createdAt: string;
     totalIncome: number;
-}
-
-export interface RequestBody {
-    username: string,
-    password: string
+    lastVehicle: number;
 }
 
 export interface Service {

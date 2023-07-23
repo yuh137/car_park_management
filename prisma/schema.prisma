@@ -16,6 +16,7 @@ model Admin {
   password String
   createdAt DateTime
   totalIncome Float
+  lastVehicle Float
   vehicles Vehicle[]
 }
 

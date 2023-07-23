@@ -23,13 +23,3 @@ export async function POST(request: Request){
 
     return new Response(JSON.stringify(newVehicle));
 }
-
-export async function DELETE(request: Request){
-    const body = await request.json();
-
-    const vehicleToDelete = await prisma.vehicle.findUnique({
-        where: {
-            identification: body.identification,
-        }
-    })
-}

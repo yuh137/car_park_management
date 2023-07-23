@@ -18,6 +18,7 @@ export async function POST(request: Request){
                 password: await bcrypt.hash(body.password, 10),
                 createdAt: new Date(),
                 totalIncome: body.totalIncome || 0,
+                lastVehicle: 0
             }
         })
         

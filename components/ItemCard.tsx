@@ -46,6 +46,7 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
 
   const [openSuccessSnackbar, setOpenSuccessSnackBar] = useState(false);
   const [openUpdateSnackbar, setOpenUpdateSnackBar] = useState(false);
+  const [isCheckedOut, setIsCheckedOut] = useState(false);
 
   // function updateOilServices(vehicleId: string, used: boolean){
   //   setOilServices((prevState) => prevState.map((item) =>
@@ -78,10 +79,44 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
   }, []);
 
   useEffect(() => {
-    // console.log(parkingFee, servicesFee);
-    setTotalFee(servicesFee + parkingFee);
-    // console.log(parkingFee, servicesFee);
-  }, [parkingFee, servicesFee]);
+    console.log(parkingFee + servicesFee);
+    updateFee();
+  }, [isCheckedOut]);
+
+  async function updateFee(){
+    await fetch(`http://localhost:3000/api/user/John`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        newIncome: (parkingFee + servicesFee)
+      })
+    })
+  }
+
+  async function removeVehicle(){
+    await fetch(`http://localhost:3000/api/services/${vehicleId}/oil`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    localStorage.removeItem(`oil:${vehicleId}`);
+    await fetch(`http://localhost:3000/api/services/${vehicleId}/wash`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    localStorage.removeItem(`wash:${vehicleId}`);
+    await fetch(`http://localhost:3000/api/vehicle/${vehicleId}`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  }
 
   // UPDATE AND SAVE OIL AND WASH SERVICE INSTANCES
   async function handleUpdate(vehicleId: string){
@@ -152,22 +187,22 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
     setOpenUpdateSnackBar(true);
   }
 
-  function handleCheckout(vehicleId: string){
-    const serviceRes = fetch(`http://localhost:3000/api/services/${vehicleId}`);
+  async function handleCheckout(vehicleId: string){
+    const serviceRes = await fetch(`http://localhost:3000/api/services/${vehicleId}`);
     let services: Service[];
-    serviceRes.then(res => res.json()).then(data => {
-      services = data
-      services.forEach(service => setServicesFee(prevState => prevState + service.price));  
-    });
+
+    services = await serviceRes.json();
 
     // let servicesFee = 0;
-    // services.forEach(service => setServicesFee(prevState => prevState + service.price));
+    services.forEach(service => setServicesFee(prevState => prevState + service.price));
+    // setServicesFee(servicesFee);
 
     const daysParked = validateTime(time);
     // const parkingFee = ((type === "Truck") ? parkingCostTruck : (type === "4-seaters") ? parkingCost4 : parkingCost7) * daysParked;
     setParkingFee(((type === "Truck") ? parkingCostTruck : (type === "4-seaters") ? parkingCost4 : parkingCost7) * daysParked); //
-    // setOpenSuccessSnackBar(true);
-    // console.log(servicesFee, parkingFee);    
+    setIsCheckedOut(true);
+    setOpenSuccessSnackBar(true);
+    removeVehicle();
   }
 
   return (
@@ -206,14 +241,6 @@ const ItemCard: React.FC<ItemProps> = ({ vehicleId, owner, type, model, inputTim
               </Button>
               <Button className="bg-red-500 hover:bg-red-700 ease-in w-fit font-bold text-white" onClick={() => {
                 handleCheckout(vehicleId);
-                fetch(`http://localhost:3000/api/user/John`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    newIncome: (servicesFee + parkingFee),
-                  })
-                })
-                setOpenSuccessSnackBar(true);
                 // console.log(servicesFee, parkingFee);
                 // const totalFee = servicesFee + parkingFee;
               }}>CHECKOUT</Button>

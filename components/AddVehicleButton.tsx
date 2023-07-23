@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, FormEvent } from 'react'
-import { Button, Modal, TextField, Box, Radio, RadioGroup, FormControlLabel } from '@mui/material'
+import { Button, Modal, TextField, Box, Radio, RadioGroup, FormControlLabel, Snackbar, Alert } from '@mui/material'
 
 const AddVehicleButton = () => {
   const [open, setOpen] = useState(false);
@@ -9,6 +9,7 @@ const AddVehicleButton = () => {
   const [vehicleModel, setVehicleModel] = useState("");
   const [vehicleOwner, setVehicleOwner] = useState("");
   const [type, setType] = useState("");
+  const [openCreatedSnack, setOpenCreatedSnack] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,6 +35,7 @@ const AddVehicleButton = () => {
     setVehicleOwner("");
     setType("");
     setOpen(false);
+    setOpenCreatedSnack(true);
   }
 
   return (
@@ -66,6 +68,17 @@ const AddVehicleButton = () => {
                 </Box>
             </form>
         </Modal>
+        <Snackbar
+            open={openCreatedSnack}
+            onClose={() => setOpenCreatedSnack(false)}
+            anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+            autoHideDuration={3000}
+            key={`${vehicleId}-update`}
+        >
+            <Alert severity='success' variant='filled'>
+            Vehicle has successfully been added
+            </Alert>
+        </Snackbar>
     </>
   )
 }

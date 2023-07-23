@@ -87,7 +87,7 @@ const Navbar = () => {
             className='object-contain'
           />  
 
-          {isLoading ? (<><div>Loading</div></>) : (<div>Total income: {admin?.totalIncome}</div>)}
+          {isLoading ? (<><div>Loading</div></>) : (<div className='px-4 py-2 bg-green-500 text-white font-semibold'>Total income: {(admin?.totalIncome)?.toFixed(2)} / Latest income: {(admin?.lastVehicle)?.toFixed(2)}</div>)}
           
           <AddVehicleButton />
           {/* <Button variant='contained' className='bg-orange-500' onClick={() => signIn()}>
